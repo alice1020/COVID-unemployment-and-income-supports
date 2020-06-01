@@ -4,6 +4,7 @@
 ## Institution:  PHS, Stanford
 ##
 ## Project: 'EICT & COVID-19'
+## R-codes: 'Aggregated Analysis'
 ##-----------------------------------------------------------------------------------------------#
 
 rm(list = ls(all = TRUE)) 
@@ -13,23 +14,11 @@ options('scipen' = 999, 'digits' = 10)
 ## Load required packages
 ##-----------------------------------------------------------------------------------------------#
 
-#library(haven)
 library(tidyverse)
-library(foreign)
 library(lubridate)
 library(data.table)
 library(ipumsr)
-library(rgdal) 
-library(rgeos) 
-library(maptools)
-library(viridis)
-library(maps)
 library(ggrepel)
-library(RColorBrewer)
-library(gridExtra)
-library(CoordinateCleaner)
-library(mapproj)
-library(wesanderson)
 
 
 # Set the Stanford Color Palette
@@ -140,12 +129,12 @@ cps_ind <- cps_ind %>%
   mutate(OCC = as.integer(OCC))
 
 
-# better to categorize the Occupations before the merginf of CPS and ASEC
+# better to categorize the Occupations before the merging of CPS and ASEC
 cps_ind <- cps_ind %>%
-  # Attemt to aggregate Occupational Categories
+  # Occupational Categories
   mutate(UHRSWORKT = ifelse(UHRSWORKT == 997 | UHRSWORKT == 999, NA, UHRSWORKT), # Hours usually worked per week at all jobs
-         OCC_CAT  = ifelse(OCC >= 10   & OCC <= 430, 'Management in Business, Science, Arts',
-                           ifelse(OCC >= 500  & OCC <= 730, 'Business Operations Specialists',
+         OCC_CAT  = ifelse(OCC >= 10   & OCC <= 430, 'Management',
+                           ifelse(OCC >= 500  & OCC <= 730, 'Business Operations',
                                   ifelse(OCC >= 800  & OCC <= 950, 'Financial Specialists',
                                          ifelse(OCC >= 1000 & OCC <= 1240, 'Computer, Mathematical', 
                                                 ifelse(OCC >= 1300 & OCC <= 1540, 'Architecture, Engineering',
@@ -163,7 +152,7 @@ cps_ind <- cps_ind %>%
                                                                                                                                     ifelse(OCC >= 4300 & OCC <= 4650, 'Personal Care',
                                                                                                                                            ifelse(OCC >= 4700 & OCC <= 4865, 'Sales & Related',
                                                                                                                                                   ifelse(OCC >= 5000 & OCC <= 5940, 'Office, Administrative Support',
-                                                                                                                                                         ifelse(OCC >= 6005 & OCC <= 6130, 'Farming, Fisheries,, Forestry',
+                                                                                                                                                         ifelse(OCC >= 6005 & OCC <= 6130, 'Farming, Fisheries, Forestry',
                                                                                                                                                                 ifelse(OCC >= 6200 & OCC <= 6765, 'Construction',
                                                                                                                                                                        ifelse(OCC >= 6800 & OCC <= 6940, 'Extraction',
                                                                                                                                                                               ifelse(OCC >= 7000 & OCC <= 7630, 'Installation, Maintenance, Repair',
@@ -192,7 +181,7 @@ cps_ind <- cps_ind %>%
 cps_asec <- cps_asec %>%
   select(COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, OCCLY, UHRSWORKLY, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED) %>%
   rename(OCC = OCCLY) %>%
-  # I recode NAs to avoid problems when averaging over CBSASZ
+  # I recode NAs to avoid problems when averaging over a grouping variable
   mutate(INCTOT   = ifelse(INCTOT == 999999999 | INCTOT == 999999998, 0, INCTOT), # 'Total personal income'
          INCWAGE  = ifelse(INCWAGE == 99999999 | INCWAGE == 99999998, 0, INCWAGE), # Wage and salary income
          INCLONGJ = ifelse(INCLONGJ == 999999999, 0, INCLONGJ), # Earnings from longest job
@@ -200,8 +189,8 @@ cps_asec <- cps_asec %>%
          OINCFARM = ifelse(OINCFARM == 999999999, 0, OINCFARM), # Earnings from other work included farm self-employment earnings
          OINCWAGE = ifelse(OINCWAGE == 999999999, 0, OINCWAGE), # Earnings from other work included wage and salary earnings
          EITCRED  = ifelse(EITCRED == 9999, 0, EITCRED), # Earned income tax credit
-         OCC_CAT  = ifelse(OCC >= 10   & OCC <= 430, 'Management in Business, Science, Arts',
-                           ifelse(OCC >= 500  & OCC <= 730, 'Business Operations Specialists',
+         OCC_CAT  = ifelse(OCC >= 10   & OCC <= 430, 'Management',
+                           ifelse(OCC >= 500  & OCC <= 730, 'Business Operations',
                                   ifelse(OCC >= 800  & OCC <= 950, 'Financial Specialists',
                                          ifelse(OCC >= 1000 & OCC <= 1240, 'Computer, Mathematical', 
                                                 ifelse(OCC >= 1300 & OCC <= 1540, 'Architecture, Engineering',
@@ -219,7 +208,7 @@ cps_asec <- cps_asec %>%
                                                                                                                                     ifelse(OCC >= 4300 & OCC <= 4650, 'Personal Care',
                                                                                                                                            ifelse(OCC >= 4700 & OCC <= 4865, 'Sales & Related',
                                                                                                                                                   ifelse(OCC >= 5000 & OCC <= 5940, 'Office, Administrative Support',
-                                                                                                                                                         ifelse(OCC >= 6005 & OCC <= 6130, 'Farming, Fisheries,, Forestry',
+                                                                                                                                                         ifelse(OCC >= 6005 & OCC <= 6130, 'Farming, Fisheries, Forestry',
                                                                                                                                                                 ifelse(OCC >= 6200 & OCC <= 6765, 'Construction',
                                                                                                                                                                        ifelse(OCC >= 6800 & OCC <= 6940, 'Extraction',
                                                                                                                                                                               ifelse(OCC >= 7000 & OCC <= 7630, 'Installation, Maintenance, Repair',
@@ -251,7 +240,7 @@ cps <- left_join(cps_ind, cps_asec, by = c('COUNTY', 'STATECENSUS', 'STATEFIP', 
 
 cps_emp_occ <- cps %>%
   filter(DATE == '2020-02-01' | DATE == '2020-03-01' | DATE == '2020-04-01') %>%
-  filter(LABFORCE == 2) %>% # only people in the labour force P.S. Are we interested in Armed Forces???
+  filter(LABFORCE == 2) %>% # only people in the labour force 
   # Re-code Employment status in order to have only two categories (Emp vs Unemp)
   mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed')) %>% 
   group_by(DATE, OCC_CAT) %>%
@@ -269,27 +258,27 @@ cps_emp_occ <- cps %>%
   mutate(DELTA_EMPSTAT_OCC = PERC_EMPSTAT_OCC - dplyr::lag(PERC_EMPSTAT_OCC, 2, order_by = DATE), # create delta variation in percentage of people employed vs unemployed
          DATE_DIFF = ifelse(DATE == '2020-04-01', '20.03 -> 20.04', NA),
          WHITE = ifelse(DELTA_EMPSTAT_OCC < -0.15, 0,1),
-         DELTA_EMPSTAT_OCC_PERC = scales::percent(DELTA_EMPSTAT_OCC),
-         OCC_PERC = paste0(OCC_CAT, "\n", DELTA_EMPSTAT_OCC_PERC)) %>%
+         DELTA_EMPSTAT_OCC_PERC = scales::percent(DELTA_EMPSTAT_OCC)) %>%
   ungroup() %>%
   filter(EMPSTAT == 'At work & Has job, not at work last week' & DATE_DIFF == '20.03 -> 20.04') %>%
   filter(OCC_CAT != 'No Occupation')
 
 # Plot
-plot_occ <- ggplot(data = cps_emp_occ, aes(x = reorder(OCC_CAT, DELTA_EMPSTAT_OCC), y = DELTA_EMPSTAT_OCC, fill = INCWAGE)) + 
-  geom_bar(stat = 'identity', position = 'stack', color = '#dad7cb', width = 0.4) +
-  labs(y = '% Difference in Employment', x = '', fill = '', 
-       title = '% Difference in employment between February and April 2020 by occupation') + 
+plot_occ <- ggplot(data = cps_emp_occ) + 
+  geom_bar(aes(x = reorder(OCC_CAT, DELTA_EMPSTAT_OCC), y = DELTA_EMPSTAT_OCC, fill = INCWAGE), 
+           stat = 'identity', position = 'stack', color = '#dad7cb', width = 0.4) +
+  labs(y = '% Difference in Employment', x = '', fill = '') + 
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_x_discrete(position = 'top') + 
-  geom_text(aes(label = scales::percent(DELTA_EMPSTAT_OCC), fontface = 2), position = position_dodge(width = 1), hjust = 1.5, size = 3, color = '#2F2424') +
-  scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
+  geom_text(aes(x = reorder(OCC_CAT, DELTA_EMPSTAT_OCC), y = (DELTA_EMPSTAT_OCC + .005 * sign(DELTA_EMPSTAT_OCC)), label = scales::percent(DELTA_EMPSTAT_OCC), 
+                fontface = 2), position = position_dodge(width = 1), size = 3.5, color = '#2F2424') +
+  scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Average Wage in 2018') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
   theme(legend.direction = "horizontal", legend.position = c(0.2, 0.9), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 12, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -298,7 +287,7 @@ plot_occ <- ggplot(data = cps_emp_occ, aes(x = reorder(OCC_CAT, DELTA_EMPSTAT_OC
   coord_flip()
 plot_occ
 
-#ggsave('Empl_Occ.png', plot = plot_occ, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
+ggsave('Empl_Occ.png', plot = plot_occ, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
 
 
 #############################
@@ -307,18 +296,18 @@ plot_occ
 
 plot_eitc <- ggplot(data = cps_emp_occ, aes(x = EITCRED, y = DELTA_EMPSTAT_OCC, color = reorder(OCC_CAT, INCWAGE), size = OCC_CAT_N)) + 
   geom_point() +
-  labs(y = '% Difference in Employment', x = 'Ave. EITC in USD', color = '', size = '# of People Employed',
-       title = 'EITC 2019 vs % Difference in employment between February and April 2020 by occupation') + 
+  labs(y = '% Difference in Employment', x = 'Average 2019 EITC (USD)', color = '', size = '# of People Employed') + 
   scale_size(range = c(3,15)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  geom_text_repel(aes(label = OCC_PERC),  fontface = 'bold',  size = 3, lineheight = .7, color = '#2F2424', vjust = -.1, hjust = .1) +
+  geom_text_repel(aes(label = OCC_CAT),  fontface = 'bold',  size = 3.5, lineheight = .7, color = '#2F2424', box.padding = 1) +
   scale_color_stanford(palette = 'cool') +
   geom_hline(yintercept = 0, linetype = 'dotted', color = '#2F2424') +
   theme_minimal() +
-  theme(legend.direction = "vertical",  legend.position = c(0.1, 0.15), legend.box = "vertical",
+  xlim(0, 810) +
+  theme(legend.direction = "vertical",  legend.position = c(0.1, 0.2), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 12, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -326,7 +315,7 @@ plot_eitc <- ggplot(data = cps_emp_occ, aes(x = EITCRED, y = DELTA_EMPSTAT_OCC, 
   guides(color = FALSE )
 plot_eitc
 
-#ggsave('EITC_Occ.png', plot = plot_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
+ggsave('EITC_Occ.png', plot = plot_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
 
 
 
@@ -351,8 +340,7 @@ cps_dist <- cps  %>%
 dist_rout <- ggplot(data = cps_dist, aes(x = INCWAGE, color = reorder(OCC_ROUT, W_AVE), fill = reorder(OCC_ROUT, W_AVE))) + 
   geom_density(alpha = 0.2) +
   xlim(0, 200000) +
-  labs(y = 'Density', x = 'Annual Wage USD', color = 'Occupational Categories', fill = 'Occupational Categories',
-       title = 'Wage Distribution by Occupation') + 
+  labs(y = 'Density', x = 'Annual Wage USD', color = 'Occupational Categories', fill = 'Occupational Categories') + 
   scale_color_stanford(palette = 'cool reverse') +
   scale_fill_stanford(palette = 'cool reverse') +
   theme_minimal() +
@@ -366,7 +354,7 @@ dist_rout <- ggplot(data = cps_dist, aes(x = INCWAGE, color = reorder(OCC_ROUT, 
         panel.grid = element_line(colour = '#dad7cb')) 
 dist_rout
 
-#ggsave('W_Dist_Rout.png', plot = dist_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 20, height = 15,  units = c('cm'))
+ggsave('W_Dist_Rout.png', plot = dist_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 20, height = 15,  units = c('cm'))
 
 ##############################################
 # % Employment Difference by wage quantile
@@ -374,7 +362,7 @@ dist_rout
 
 cps_emp <- cps %>%
   filter(DATE == '2020-02-01' | DATE == '2020-03-01' | DATE == '2020-04-01') %>%
-  filter(LABFORCE == 2) %>% # only people in the labour force P.S. Are we interested in Armed Forces???
+  filter(LABFORCE == 2) %>% # only people in the labour force 
   # Re-code Employment status in order to have only two categories (Emp vs Unemp)
   mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed')) %>% 
   group_by(DATE) %>%
@@ -392,7 +380,7 @@ cps_emp <- cps %>%
 
 cps_emp_rout <- cps %>%
   filter(DATE == '2020-02-01' | DATE == '2020-03-01' | DATE == '2020-04-01') %>%
-  filter(LABFORCE == 2) %>% # only people in the labour force P.S. Are we interested in Armed Forces???
+  filter(LABFORCE == 2) %>% # only people in the labour force 
   # Re-code Employment status in order to have only two categories (Emp vs Unemp)
   mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed')) %>% 
   group_by(OCC_ROUT) %>%
@@ -430,18 +418,17 @@ cps_emp_rout <- filter(cps_emp_rout, EMPSTAT == 'At work & Has job, not at work 
 
 plot_rout <- ggplot(data = arrange(cps_emp_rout, -DELTA_EMPSTAT_OCC) , aes(x = reorder(OCC_ROUT, DELTA_EMPSTAT_OCC), y = DELTA_EMPSTAT_OCC1, fill = INCWAGEQUANT)) + 
   geom_bar(stat = 'identity',width = 0.4) +
-  labs(y = '% Total Difference in Employment', x = 'Occupation Category', fill = 'Income Quartiles', 
-       title = '% Difference in employment between February and April 2020 by wage quartiles and occupational category') + 
+  labs(y = '% Total Difference in Employment', x = '', fill = 'Average Wage in 2018') + 
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_x_discrete(position = 'top') + 
-  geom_text(aes(label = scales::percent(DELTA_EMPSTAT_OCC, accuracy = .1), fontface = 2), position = position_stack(0.5), size = 3, color = '#2F2424') +
+  geom_text(aes(label = scales::percent(DELTA_EMPSTAT_OCC, accuracy = .1), fontface = 2), position = position_stack(0.5), size = 3.5, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE) +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
   theme(legend.direction = "horizontal", legend.position = c(0.2, 0.9), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 12, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -450,7 +437,7 @@ plot_rout <- ggplot(data = arrange(cps_emp_rout, -DELTA_EMPSTAT_OCC) , aes(x = r
   coord_flip()
 plot_rout
 
-#ggsave('Empl_Rout.png', plot = plot_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 20, height = 15,  units = c('cm'))
+ggsave('Empl_Rout.png', plot = plot_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
 
 
 ##############################################
@@ -460,7 +447,7 @@ plot_rout
 # Average Employed working hrs & unemployed working hrs
 cps_hrs_occ <- cps %>%
   filter(DATE == '2020-02-01' | DATE == '2020-03-01' | DATE == '2020-04-01') %>%
-  filter(LABFORCE == 2) %>% # only people in the labour force P.S. Are we interested in Armed Forces???
+  filter(LABFORCE == 2) %>% # only people in the labour force 
   mutate(UHRSWORKT = ifelse(is.na(UHRSWORKT), 0 , UHRSWORKT)) %>% # 10 At work, 12 Has job, not at work last week,  21 Unemployed, experienced worker, 22 Unemployed, new worker    
   group_by(DATE, OCC_CAT) %>%
   summarize(TOT_HRS_OCC = mean(UHRSWORKT, na.rm = TRUE),
@@ -474,8 +461,7 @@ cps_hrs_occ <- cps %>%
 
 plot_hrs <- ggplot(data = cps_hrs_occ, aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, fill = INCWAGE)) + 
   geom_bar(stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
-  labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '', 
-       title = 'Difference in Hours usually worked per week at all jobs between February and April 2020 by occupation (incl. unemployed with hrs = 0)') + 
+  labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
   geom_text(aes(label = DELTA_HRS_OCC, fontface = 2), position = position_dodge(width = 1), hjust = 1.5, size = 3, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
@@ -493,7 +479,7 @@ plot_hrs <- ggplot(data = cps_hrs_occ, aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), 
   coord_flip()
 plot_hrs
 
-#ggsave('Hrs_Occ.png', plot = plot_hrs, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
+ggsave('Hrs_Occ.png', plot = plot_hrs, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
 
 
 
@@ -516,8 +502,7 @@ cps_hrs_occ1 <- cps %>%
 
 plot_hrs_emp <- ggplot(data = cps_hrs_occ1, aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, fill = INCWAGE)) + 
   geom_bar(stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
-  labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '', 
-       title = 'Difference in Hours usually worked per week at all jobs between February and April 2020 by occupation among employed only') + 
+  labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
   geom_text(aes(label = DELTA_HRS_OCC, fontface = 2), position = position_dodge(width = 1), hjust = 1.5, size = 3, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
@@ -535,5 +520,5 @@ plot_hrs_emp <- ggplot(data = cps_hrs_occ1, aes(x = reorder(OCC_CAT, DELTA_HRS_O
   coord_flip()
 plot_hrs_emp
 
-#ggsave('Hrs_Occ_Emp.png', plot = plot_hrs_emp, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
+ggsave('Hrs_Occ_Emp.png', plot = plot_hrs_emp, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
 
