@@ -17,19 +17,19 @@ CPS is a survey which has basically been used for the analysis of cross-sectiona
 
 The following figure visualizes the longitudinal structure of the survey. Our data ample cover the time span from January 2019 to April 2020. Each line represent an individual longitudinal record. Wave March 2019 is my master wave since it is the most recent information about EICT and earnigns we have. Gray represents when the individual is out of the CPS's sample.
 
-<center>
-![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis.png)
-</center>
+
+![Sequence Analysis](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis.png)
 **Fig. 1:** Sequence Analysis of the Employment Status from January 2019 to April 2020.
 
-<center>
-![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Legend.png)
-</center>
 
-<center>
+
+![Employment Status Legend](https://aliceindataland.rbind.io/img/COVID-19-EITC/Legend.png)
+
+
+
 ![Employment Status Frequencies](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis_Density.png)
 **Fig. 2:** Sequence Analysis of the Employment Status Frequencies from January 2019 to April 2020 .
-</center>
+
 
 
 ## Statistical Exploration
@@ -43,10 +43,10 @@ We are interested in analysing the effects of COVID-19 on the employment status 
 | Individual |        19,013        |        4,700       |       370     |         
 | Household  |        10,456        |        3,984       |       363     |
 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/EITC_Emp_Sub.png)
 **Fig. 3:** EITC 2019 and Employment status in April 2020
-</center>
+
 
 Codes available in the file: Disaggregated_analysis.R
 
@@ -72,39 +72,39 @@ We analaze the CPS data by aggregating over the occupational categories. Our cro
 
 
 ### Extensive Margin: Employment vs Unemployment
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Empl_Occ.png)
 **Fig. 4:** % Difference in employment between February and April 2020 by occupational category.
-</center>
 
-<center>
+
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/W_Dist_Rout.png)
 **Fig. 5:** Wage Distribution by Occupation.
-</center>
 
-<center>
+
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Empl_Rout.png)
 **Fig 6:** % Difference in employment between February and April 2020 for by wage quartile. 
-</center>
+
 
 ### Intensive Margin: Hours Worked
 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Hrs_Occ.png)
 **Fig. 7:** Difference in hours usually worked per week at all jobs between February and April 2020 by occupation (unemployed with hrs = 0 are included).
-</center>
 
-<center>
+
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Hrs_Occ_Emp.png)
 **Fig. 8:** Difference in hours usually worked per week at all jobs between February and April 2020 by occupation among employed only.
-</center>
+
 
 ### EITC by Occupational Category
 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/EITC_Occ.png)
 **Fig. 9:** Average EITC percevied in 2019 vs % Difference in employment between February and April 2020 by occupational category.
-</center>
+
 
 Codes available in the file: Visualizations.R
 
