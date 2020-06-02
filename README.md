@@ -45,7 +45,7 @@ At an individual/household level the sample size for individuals and households 
 **Fig. 3:** EITC 2019 and Employment status in April 2020
 
 
-Codes available for this part are available in the file: Disaggregated_analysis.R
+Codes available for this part are available in the file: [Disaggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Disaggregated_analysis.R)
 
 
 ### Aggregate Occupational Level Analysis
@@ -105,7 +105,7 @@ We analaze the CPS data by aggregating over the occupational categories. Our cro
 **Fig. 9:** Average EITC percevied in 2019 vs % Difference in employment between February and April 2020 by occupational category.
 
 
-Codes available in the file: Aggregated_Analysis.R
+Codes available in the file: [Aggregated_Analysis.R]()
 
   
 
