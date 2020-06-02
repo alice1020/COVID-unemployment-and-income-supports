@@ -18,12 +18,12 @@ CPS is a survey which has basically been used for the analysis of cross-sectiona
 The following figure visualizes the longitudinal structure of the survey. Our data ample cover the time span from January 2019 to April 2020. Each line represent an individual longitudinal record. Wave March 2019 is my master wave since it is the most recent information about EICT and earnigns we have. Gray represents when the individual is out of the CPS's sample.
 
 <center>
-![Sequence Analysis](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis.png)
+![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis.png)
 </center>
 **Fig. 1:** Sequence Analysis of the Employment Status from January 2019 to April 2020.
 
 <center>
-![Employment Status Legend](https://aliceindataland.rbind.io/img/COVID-19-EITC/Legend.png)
+![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Legend.png)
 </center>
 
 <center>
