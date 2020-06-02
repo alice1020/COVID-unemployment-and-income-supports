@@ -139,10 +139,7 @@ cps <- left_join(cps_ind, cps_asec, by = c("CPSIDP", "CPSID", "COUNTY", "STATECE
 # To be classified as unemployed on temporary layoff, a person has either been given a date to return to work by their employer or expects   to be recalled to their job within 6 months. 
 
 cps <- cps %>%
-  filter(FIRST_CPS != 201804 & FIRST_CPS != 201805 & FIRST_CPS != 201806) %>% # remove if first wave survey 2018-04 2018-05 2018-06
-  mutate(
-    # Create Month/Year Variable
-    DATE = make_date(YEAR, MONTH))
+  filter(FIRST_CPS != 201804 & FIRST_CPS != 201805 & FIRST_CPS != 201806)  # remove if first wave survey 2018-04 2018-05 2018-06
 
 ##-----------------------------------------------------------------------------------------------#
 ## Descriptive Statistics
@@ -218,7 +215,7 @@ hist_eitc <- ggplot(data =  cps_20_04_sub,
   theme(legend.position = c(0.7, 0.9), 
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
