@@ -19,8 +19,8 @@ The following figure visualizes the longitudinal structure of the survey. Our da
 
 <center>
 ![Sequence Analysis](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis.png)
-**Fig. 1:** Sequence Analysis of the Employment Status from January 2019 to April 2020.
 </center>
+**Fig. 1:** Sequence Analysis of the Employment Status from January 2019 to April 2020.
 
 <center>
 ![Employment Status Legend](https://aliceindataland.rbind.io/img/COVID-19-EITC/Legend.png)
