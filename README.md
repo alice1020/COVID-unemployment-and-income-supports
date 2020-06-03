@@ -69,7 +69,7 @@ We analaze the CPS data by aggregating over the occupational categories. Our cro
 |      N     | 2020-04 |          |           |           |
 
 
-### Extensive Margin: Employment vs Unemployment
+### Employment vs Unemployment
 
 
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Empl_Occ.png)
@@ -86,7 +86,7 @@ We analaze the CPS data by aggregating over the occupational categories. Our cro
 **Fig 6:** % Difference in employment between February and April 2020 for by wage quartile. 
 
 
-### Intensive Margin: Hours Worked
+### Hours Worked
 
 
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Hrs_Occ.png)
@@ -105,7 +105,7 @@ We analaze the CPS data by aggregating over the occupational categories. Our cro
 **Fig. 9:** Average EITC percevied in 2019 vs % Difference in employment between February and April 2020 by occupational category.
 
 
-Codes available in the file: [Aggregated_Analysis.R]()
+Codes available in the file: [Aggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Aggregated_Analysis.R)
 
   
 

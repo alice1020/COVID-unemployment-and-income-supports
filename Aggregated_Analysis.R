@@ -270,15 +270,15 @@ plot_occ <- ggplot(data = cps_emp_occ) +
   labs(y = '% Difference in Employment', x = '', fill = '') + 
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   scale_x_discrete(position = 'top') + 
-  geom_text(aes(x = reorder(OCC_CAT, DELTA_EMPSTAT_OCC), y = (DELTA_EMPSTAT_OCC + .005 * sign(DELTA_EMPSTAT_OCC)), label = scales::percent(DELTA_EMPSTAT_OCC), 
+  geom_text(aes(x = reorder(OCC_CAT, DELTA_EMPSTAT_OCC), y = (DELTA_EMPSTAT_OCC + .015 * sign(DELTA_EMPSTAT_OCC)), label = scales::percent(DELTA_EMPSTAT_OCC), 
                 fontface = 2), position = position_dodge(width = 1), size = 3.5, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Average Wage in 2018') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
-  theme(legend.direction = "horizontal", legend.position = c(0.2, 0.9), legend.box = "vertical",
+  theme(legend.direction = "horizontal", legend.position = c(0.4, 0.9), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text(size = 12, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -287,7 +287,7 @@ plot_occ <- ggplot(data = cps_emp_occ) +
   coord_flip()
 plot_occ
 
-ggsave('Empl_Occ.png', plot = plot_occ, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
+ggsave('Empl_Occ.png', plot = plot_occ, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18, units = c('cm'))
 
 
 #############################
@@ -307,7 +307,7 @@ plot_eitc <- ggplot(data = cps_emp_occ, aes(x = EITCRED, y = DELTA_EMPSTAT_OCC, 
   theme(legend.direction = "vertical",  legend.position = c(0.1, 0.2), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text(size = 12, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -344,10 +344,10 @@ dist_rout <- ggplot(data = cps_dist, aes(x = INCWAGE, color = reorder(OCC_ROUT, 
   scale_color_stanford(palette = 'cool reverse') +
   scale_fill_stanford(palette = 'cool reverse') +
   theme_minimal() +
-  theme(legend.direction = 'vertical', legend.position = c(0.9, 0.9), 
+  theme(legend.direction = 'vertical', legend.position = c(0.7, 0.8), 
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -425,10 +425,10 @@ plot_rout <- ggplot(data = arrange(cps_emp_rout, -DELTA_EMPSTAT_OCC) , aes(x = r
   scale_fill_stanford(palette = 'cool', discrete = FALSE) +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
-  theme(legend.direction = "horizontal", legend.position = c(0.2, 0.9), legend.box = "vertical",
+  theme(legend.direction = "horizontal", legend.position = c(0.3, 0.9), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text(size = 12, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -437,7 +437,7 @@ plot_rout <- ggplot(data = arrange(cps_emp_rout, -DELTA_EMPSTAT_OCC) , aes(x = r
   coord_flip()
 plot_rout
 
-ggsave('Empl_Rout.png', plot = plot_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
+ggsave('Empl_Rout.png', plot = plot_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
 
 
 ##############################################
@@ -459,18 +459,21 @@ cps_hrs_occ <- cps %>%
   filter(DATE ==  '2020-04-01') %>%
   filter(OCC_CAT != 'No Occupation')
 
-plot_hrs <- ggplot(data = cps_hrs_occ, aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, fill = INCWAGE)) + 
-  geom_bar(stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
+  
+plot_hrs <- ggplot(data = cps_hrs_occ) + 
+  geom_bar( aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, fill = INCWAGE),
+            stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
   labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
-  geom_text(aes(label = DELTA_HRS_OCC, fontface = 2), position = position_dodge(width = 1), hjust = 1.5, size = 3, color = '#2F2424') +
+  geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, label = DELTA_HRS_OCC, 
+                fontface = 2), position = position_dodge(width = 1), hjust = 1, size = 4, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
-  theme(legend.direction = "horizontal", legend.position = c(0.2, 0.9), legend.box = "vertical",
+  theme(legend.direction = "horizontal", legend.position = c(0.3, 0.9), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -479,7 +482,7 @@ plot_hrs <- ggplot(data = cps_hrs_occ, aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), 
   coord_flip()
 plot_hrs
 
-ggsave('Hrs_Occ.png', plot = plot_hrs, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
+ggsave('Hrs_Occ.png', plot = plot_hrs, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 32, height = 17,  units = c('cm'))
 
 
 
@@ -500,18 +503,21 @@ cps_hrs_occ1 <- cps %>%
   filter(DATE ==  '2020-04-01') %>%
   filter(OCC_CAT != 'No Occupation')
 
-plot_hrs_emp <- ggplot(data = cps_hrs_occ1, aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, fill = INCWAGE)) + 
-  geom_bar(stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
+
+plot_hrs_emp <- ggplot(data = cps_hrs_occ1) + 
+  geom_bar(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, fill = INCWAGE), 
+           stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
   labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
-  geom_text(aes(label = DELTA_HRS_OCC, fontface = 2), position = position_dodge(width = 1), hjust = 1.5, size = 3, color = '#2F2424') +
+  geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = (DELTA_HRS_OCC + .045 * sign(DELTA_HRS_OCC)), label = DELTA_HRS_OCC, fontface = 2),
+            position = position_dodge(width = 1), size = 4, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
   theme(legend.direction = "horizontal", legend.position = c(0.7, 0.1), legend.box = "vertical",
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
-        text = element_text( size = 10, color = '#2F2424', family = 'Source Sans Pro'),
+        text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
         panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
         plot.background = element_rect(fill = '#F9F6EF'),
         legend.background = element_blank(),
@@ -520,5 +526,5 @@ plot_hrs_emp <- ggplot(data = cps_hrs_occ1, aes(x = reorder(OCC_CAT, DELTA_HRS_O
   coord_flip()
 plot_hrs_emp
 
-ggsave('Hrs_Occ_Emp.png', plot = plot_hrs_emp, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 25,  units = c('cm'))
+ggsave('Hrs_Occ_Emp.png', plot = plot_hrs_emp, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 32, height = 17,  units = c('cm'))
 
