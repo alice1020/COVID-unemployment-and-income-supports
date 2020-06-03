@@ -1,10 +1,9 @@
 # COVID-19: Unemployment and Income Supports
-Data and Codes blog post: "COVID, unemployment and income supports"."
-
+Data and Codes blog post: "COVID, unemployment and income supports".
 
 ## Data Sources: Census Current Population Survey (CPS)
 
-Data comes from the Current Population Survey, which have been download from: https://cps.ipums.org/cps/index.shtml (registration required).
+Data come from the Current Population Survey, which have been download from: https://cps.ipums.org/cps/index.shtml (registration required).
 
 The codebooks for the extraction are the files:
 
@@ -14,10 +13,10 @@ Among the variables listed in CPS_19-01_20-04_Extr_Codebook.xml, we selected: YE
 2. ASEC_2019_Extr_Codebook.xml for the 2019 Annual Social and Economic Supplement (ASEC) of 03-2019.
 Among the variables listed in CPS_19-01_20-04_Extr_Codebook.xml, we selected: CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, OCCLY, UHRSWORKLY, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED.
   
-The Current Population Survey has monthly data for a core set of questions, which include employment status, occupation, geographical information, etc. Extensive data about socio-economic varibales, such as earnings, Earned Income Tax Credit (EITC), health insurance, etc. are colleceted once a year (March) by the Social and Economic Supplement (ASEC) module.
-CPS is a survey which has basically been used for the analysis of cross-sectional data. It has a sampling scheme defined as 4-8-4. One household stays in the sample for max. 16 months (4+8+4). The household is interviewed during each of the first 4 months after entering the survey, followed by 8 without interview. The household is then interviewd again for 4 consequitive month, one year (4+8) after its first wave in order to match the seasonality.
+The Current Population Survey has monthly data for a core set of questions, which include employment status, occupation, geographical information, etc. Extensive data about socio-economic variables, such as earnings, Earned Income Tax Credit (EITC), health insurance, etc. are collected once a year (March) by the Social and Economic Supplement (ASEC) module.
+CPS is a survey which has basically been used for the analysis of cross-sectional data. It has a sampling scheme defined as 4-8-4. One household stays in the sample for max. 16 months (4+8+4). The household is interviewed during each of the first 4 months after entering the survey, followed by 8 without interview. The household is then interviews again for 4 consecutive month, one year (4+8) after its first wave in order to match the seasonality.
 
-The following figure visualizes the longitudinal structure of the survey. Our data ample cover the time span from January 2019 to April 2020. Each line represent an individual longitudinal record. Wave March 2019 is my master wave since it is the most recent information about EICT and earnigns we have. Gray represents when the individual is out of the CPS's sample.
+The following figure visualizes the longitudinal structure of the survey. Our data ample cover the time span from January 2019 to April 2020. Each line represent an individual longitudinal record. Wave March 2019 is my master wave since it is the most recent information about EICT and earnings we have. Gray represents when the individual is out of the CPS's sample.
 
 
 ![Sequence Analysis](https://aliceindataland.rbind.io/img/COVID-19-EITC/Sequence_Analysis.png)
@@ -30,10 +29,10 @@ The following figure visualizes the longitudinal structure of the survey. Our da
 
 
 ## Statistical Exploration
-We are interested in analysing the effects of COVID-19 on the employment status with a focus on the Earned Income Tax Credit (EITC). 
+We are interested in analyzing the effects of COVID-19 on the employment status with a focus on the Earned Income Tax Credit (EITC). 
 
-### Individual Level Logitudinal Analysis
-At an individual/household level the sample size for individuals and households obseved both in March 2019 (ASEC wave) and April 2020  corresponds to 19,013 individuals and 10,456 households. Among those a sub-sample of 4,700 individuals grouped in 3,984 households are part of the labour force. Visually these are mirrored in the three waves at the top of of Fig. 1. At the end, ~9.3% of the households in the sub-sample have received EITC.
+### Individual Level Longitudinal Analysis
+At an individual/household level the sample size for individuals and households observed both in March 2019 (ASEC wave) and April 2020  corresponds to 19,013 individuals and 10,456 households. Among those a sub-sample of 4,700 individuals grouped in 3,984 households are part of the labour force. Visually these are mirrored in the three waves at the top of of Fig. 1. At the end, ~9.3% of the households in the sub-sample have received EITC.
 
 |   Level    | # Obs. 03-19 & 04-20 | In the Labor Force | with EITC > 0 |
 |------------|----------------------|--------------------|---------------|
@@ -50,7 +49,7 @@ Codes available for this part are available in the file: [Disaggregated_Analysis
 
 ### Aggregate Occupational Level Analysis
 
-We analaze the CPS data by aggregating over the occupational categories. Our cross-sectional unit becomes the occupational category. The data structure becomes the following
+We analyze the CPS data by aggregating over the occupational categories. Our cross-sectional unit becomes the occupational category. The data structure becomes the following
 
 
 | Occupation |   Time  | % Unempl | Ave. Earn | Ave. EITC | 
@@ -102,7 +101,7 @@ We analaze the CPS data by aggregating over the occupational categories. Our cro
 
 
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/EITC_Occ.png)
-**Fig. 9:** Average EITC percevied in 2019 vs % Difference in employment between February and April 2020 by occupational category.
+**Fig. 9:** Average EITC perceived in 2019 vs % Difference in employment between February and April 2020 by occupational category.
 
 
 Codes available in the file: [Aggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Aggregated_Analysis.R)
