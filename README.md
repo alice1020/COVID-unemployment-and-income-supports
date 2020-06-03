@@ -14,7 +14,7 @@ Among the variables listed in CPS_19-01_20-04_Extr_Codebook.xml, we selected: YE
 Among the variables listed in CPS_19-01_20-04_Extr_Codebook.xml, we selected: CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, OCCLY, UHRSWORKLY, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED.
   
 The Current Population Survey has monthly data for a core set of questions, which include employment status, occupation, geographical information, etc. Extensive data about socio-economic variables, such as earnings, Earned Income Tax Credit (EITC), health insurance, etc. are collected once a year (March) by the Social and Economic Supplement (ASEC) module.
-CPS is a survey which has basically been used for the analysis of cross-sectional data. It has a sampling scheme defined as 4-8-4. One household stays in the sample for max. 16 months (4+8+4). The household is interviewed during each of the first 4 months after entering the survey, followed by 8 without interview. The household is then interviews again for 4 consecutive month, one year (4+8) after its first wave in order to match the seasonality.
+CPS is a survey which has basically been used for the analysis of cross-sectional data. It has a sampling scheme defined as 4-8-4. One household stays in the sample for max. 16 months (4+8+4). The household is interviewed during each of the first 4 months after entering the survey, followed by 8 without interview. The household is then interviewed again for 4 consecutive month, one year (4+8) after its first wave in order to match the seasonality.
 
 The following figure visualizes the longitudinal structure of the survey. Our data ample cover the time span from January 2019 to April 2020. Each line represent an individual longitudinal record. Wave March 2019 is my master wave since it is the most recent information about EICT and earnings we have. Gray represents when the individual is out of the CPS's sample.
 
@@ -44,7 +44,7 @@ At an individual/household level the sample size for individuals and households 
 **Fig. 3:** EITC 2019 and Employment status in April 2020
 
 
-Codes available for this part are available in the file: [Disaggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Disaggregated_analysis.R)
+Codes for this part are available in the file: [Disaggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Disaggregated_analysis.R)
 
 
 ### Aggregate Occupational Level Analysis
@@ -104,7 +104,8 @@ We analyze the CPS data by aggregating over the occupational categories. Our cro
 **Fig. 9:** Average EITC perceived in 2019 vs % Difference in employment between February and April 2020 by occupational category.
 
 
-Codes available in the file: [Aggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Aggregated_Analysis.R)
+Codes for this part are available in the file:
+[Aggregated_Analysis.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Aggregated_Analysis.R)
 
   
 
