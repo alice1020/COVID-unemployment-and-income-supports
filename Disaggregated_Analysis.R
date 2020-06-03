@@ -194,7 +194,7 @@ cps_20_04 <- cps_20_04 %>%
   # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
   filter(DATE == '2020-04-01') %>%
   filter(LABFORCE == 2) %>%
-  mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed, ~9.3%'),
+  mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed, ~17%'),
          EITCRED = ifelse(EITCRED == 9999, 0, EITCRED)) 
 # Sample Size Household CPSID: 3,984
 

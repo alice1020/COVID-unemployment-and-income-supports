@@ -466,7 +466,7 @@ plot_hrs <- ggplot(data = cps_hrs_occ) +
   labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
   geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = DELTA_HRS_OCC, label = DELTA_HRS_OCC, 
-                fontface = 2), position = position_dodge(width = 1), hjust = 1, size = 4, color = '#2F2424') +
+                fontface = 2), position = position_dodge(width = 1), hjust = 1.5, size = 4, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
@@ -509,7 +509,7 @@ plot_hrs_emp <- ggplot(data = cps_hrs_occ1) +
            stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
   labs(y = 'Difference in hours usually worked per week at all jobs', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
-  geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = (DELTA_HRS_OCC + .045 * sign(DELTA_HRS_OCC)), label = DELTA_HRS_OCC, fontface = 2),
+  geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = (DELTA_HRS_OCC + .08 * sign(DELTA_HRS_OCC)), label = DELTA_HRS_OCC, fontface = 2),
             position = position_dodge(width = 1), size = 4, color = '#2F2424') +
   scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Ave. Wage 2018') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
