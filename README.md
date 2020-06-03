@@ -7,11 +7,11 @@ Data come from the Current Population Survey, which have been download from: htt
 
 The codebooks for the extraction are the files:
 
-1. CPS_19-01_20-04_Extr_Codebook.xml for the core set of questions for monthly samples from 01-2019 to 04-2020.
-Among the variables listed in CPS_19-01_20-04_Extr_Codebook.xml, we selected: YEAR, MONTH, CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, LABFORCE, OCC, EDUC99, FAMINC, EMPSTAT, UHRSWORKT.
+1. [CPS_19-01_20-04_Extr_Codebook.xml](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/CPS_19-01_20-04_Extr_Codebook.xml) for the core set of questions for monthly samples from 01-2019 to 04-2020.
+Among all the variables we selected: YEAR, MONTH, CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, LABFORCE, OCC, EDUC99, FAMINC, EMPSTAT, UHRSWORKT.
   
-2. ASEC_2019_Extr_Codebook.xml for the 2019 Annual Social and Economic Supplement (ASEC) of 03-2019.
-Among the variables listed in CPS_19-01_20-04_Extr_Codebook.xml, we selected: CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, OCCLY, UHRSWORKLY, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED.
+2. [ASEC_2019_Extr_Codebook.xml](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/ASEC_2019_Extr_Codebook.xml) for the 2019 Annual Social and Economic Supplement (ASEC) of 03-2019.
+Among all the variables we selected: CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, OCCLY, UHRSWORKLY, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED.
   
 The Current Population Survey has monthly data for a core set of questions, which include employment status, occupation, geographical information, etc. Extensive data about socio-economic variables, such as earnings, Earned Income Tax Credit (EITC), health insurance, etc. are collected once a year (March) by the Social and Economic Supplement (ASEC) module.
 CPS is a survey which has basically been used for the analysis of cross-sectional data. It has a sampling scheme defined as 4-8-4. One household stays in the sample for max. 16 months (4+8+4). The household is interviewed during each of the first 4 months after entering the survey, followed by 8 without interview. The household is then interviewed again for 4 consecutive month, one year (4+8) after its first wave in order to match the seasonality.
