@@ -184,18 +184,18 @@ table(cps_sub_20$EMPSTAT)
 #########################################
 
 # Merge Monthly CPS and ASEC  
-cps_20_04 <- left_join(cps_asec, cps_ind,  by = c("CPSIDP", "CPSID", "COUNTY", "STATECENSUS", "STATEFIP", "REGION", "CBSASZ", "OCC")) %>%
+cps <- left_join(cps_asec, cps_ind,  by = c("CPSIDP", "CPSID", "COUNTY", "STATECENSUS", "STATEFIP", "REGION", "CBSASZ", "OCC")) %>%
   separate(CPSID, into = c('FIRST_CPS', 'REST_ID'), sep = 6, remove = F) %>% # Separate the first time interviewed
   rename(UHRSWORKLY2019 = UHRSWORKLY) %>%
   select(DATE, CPSIDP, CPSID, FIRST_CPS, REST_ID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, EDUC99, OCC, LABFORCE, EMPSTAT, UHRSWORKT,
-         FAMINC, UHRSWORKLY2019, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED)
-
-cps_20_04 <- cps_20_04 %>%
-  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
-  filter(DATE == '2020-04-01') %>%
+         FAMINC, UHRSWORKLY2019, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED) %>%
   filter(LABFORCE == 2) %>%
   mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed, ~17%'),
          EITCRED = ifelse(EITCRED == 9999, 0, EITCRED)) 
+
+cps_20_04 <- cps %>%
+  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
+  filter(DATE == '2020-04-01')
 # Sample Size Household CPSID: 3,984
 
 # Filter for individuals whi have receiver EITC > 0
@@ -225,6 +225,16 @@ hist_eitc
 ggsave('EITC_Emp_Sub.png', plot = hist_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
 
 
-nrow(filter(cps_20_04_sub, EMPSTAT == 'Unemployed')) / nrow(cps_20_04_sub)
-# 62 out of 370 (~17%) individuals who received EITC in 2019 is unemployed in April 2020.
+nrow(filter(cps_20_04_sub, EMPSTAT == 'Unemployed, ~17%')) / nrow(cps_20_04_sub)
+# 62 out of 370 (~17%) individuals who received EITC in 2019 are unemployed in April 2020.
 
+# Compare with 2019-03
+cps_19_03 <- cps %>%
+  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
+  filter(DATE == '2019-03-01') 
+
+nrow(filter(cps_19_03, EMPSTAT == 'Unemployed, ~17%')) / nrow(cps_19_03)
+# ~2.6% individuals who received EITC in 2019 were unemployed in March 2019.
+
+  
+  
