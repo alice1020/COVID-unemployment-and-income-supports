@@ -98,7 +98,7 @@ We analyze the CPS data by aggregating over the occupational categories. Our cro
 
 ### Weekly Earnings
 
-![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Earn_Occ_Emp.png){}
+![](https://aliceindataland.rbind.io/img/COVID-19-EITC/Earn_Occ_Emp.png)
 **Fig. 9:** Difference in weekly earnings at the main job between February and April 2020 by occupation among employed only.
 
 ### EITC by Occupational Category

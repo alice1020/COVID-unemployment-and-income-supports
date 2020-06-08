@@ -208,7 +208,7 @@ cps_core_occ <- cps_core %>%
   mutate(DELTA_EMPL_PERC = EMPL_PERC - dplyr::lag(EMPL_PERC, 2, order_by = DATE), # create delta variation in percentage of people employed vs unemployed
          DELTA_EMPL_OCC_PERC = scales::percent(DELTA_EMPL_PERC), # Graphical reasons
          DELTA_HRS_OCC = round(UHRSWORK1 - dplyr::lag(UHRSWORK1, 2, order_by = DATE), digits = 1),
-         DELTA_EAR_OCC = round(EARNWEEK - dplyr::lag(EARNWEEK, 2, order_by = DATE), digits = 1)) %>%
+         DELTA_EAR_OCC = round(EARNWEEK - dplyr::lag(EARNWEEK, 2, order_by = DATE))) %>%
   ungroup() %>%
   left_join(., count_occ, by = "OCC_CAT")
 
@@ -398,7 +398,7 @@ plot_occ <- ggplot(data = cps_occ) +
   coord_flip()
 plot_occ
 
-ggsave('Empl_Occ.png', plot = plot_occ, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18, units = c('cm'))
+#ggsave('Empl_Occ.png', plot = plot_occ, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18, units = c('cm'))
 
 
 #############################
@@ -426,7 +426,7 @@ plot_eitc <- ggplot(data = cps_occ, aes(x = EITCRED, y = DELTA_EMPL_PERC, color 
   guides(color = FALSE )
 plot_eitc
 
-ggsave('EITC_Occ.png', plot = plot_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
+#ggsave('EITC_Occ.png', plot = plot_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 35, height = 20,  units = c('cm'))
 
 
 ##------------------------------------------------------------#
@@ -464,7 +464,7 @@ dist_rout <- ggplot(data = cps_dist, aes(x = EARNWEEK, color = reorder(OCC_ROUT,
         panel.grid = element_line(colour = '#dad7cb')) 
 dist_rout
 
-ggsave('W_Dist_Rout.png', plot = dist_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 20, height = 15,  units = c('cm'))
+#ggsave('W_Dist_Rout.png', plot = dist_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 20, height = 15,  units = c('cm'))
 
 ##############################################
 # % Employment Difference by wage quantile
@@ -496,7 +496,7 @@ plot_rout <- ggplot(data = arrange(cps_rout, DELTA_EMP_ROUT_QT_REL) , aes(x = re
   coord_flip()
 plot_rout
 
-ggsave('Empl_Rout.png', plot = plot_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
+#ggsave('Empl_Rout.png', plot = plot_rout, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
 
 
 ###############################################################
@@ -512,7 +512,7 @@ plot_hrs_emp <- ggplot(data = cps_occ) +
   scale_x_discrete(position = 'top') + 
   geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = (DELTA_HRS_OCC + .08 * sign(DELTA_HRS_OCC)), label = DELTA_HRS_OCC, fontface = 2),
             position = position_dodge(width = 1), size = 4, color = '#2F2424') +
-  scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Weekly Earnings (USD)') +
+  scale_fill_stanford(palette = 'cool reverse', discrete = FALSE, name = 'Weekly Earnings (USD)') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
   theme(legend.direction = "horizontal", legend.position = c(0.3, 0.9), legend.box = "vertical",
@@ -559,7 +559,7 @@ plot_hrs <- ggplot(data = cps_hrs) +
   scale_x_discrete(position = 'top') + 
   geom_text(aes(x = reorder(OCC_CAT, DELTA_HRS_OCC), y = (DELTA_HRS_OCC + .2 * sign(DELTA_HRS_OCC)), label = DELTA_HRS_OCC, fontface = 2),
             position = position_dodge(width = 1), size = 4, color = '#2F2424') +
-  scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Weekly Earnings (USD)') +
+  scale_fill_stanford(palette = 'cool reverse', discrete = FALSE, name = 'Weekly Earnings (USD)') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
   theme(legend.direction = "horizontal", legend.position = c(0.3, 0.9), legend.box = "vertical",
@@ -586,11 +586,11 @@ ggsave('Hrs_Occ.png', plot = plot_hrs, path = '/home/alice/Dropbox/PostDoc/UBI_E
 plot_earn <- ggplot(data = cps_occ) + 
   geom_bar(aes(x = reorder(OCC_CAT, DELTA_EAR_OCC), y = DELTA_EAR_OCC, fill = EARNWEEK), 
            stat = 'identity', position = 'dodge', color = '#dad7cb', width = 0.4) +
-  labs(y = 'Difference in weekly earnings at alhe main job', x = '', fill = '') + 
+  labs(y = 'Difference in weekly earnings at the main job (USD)', x = '', fill = '') + 
   scale_x_discrete(position = 'top') + 
   geom_text(aes(x = reorder(OCC_CAT, DELTA_EAR_OCC), y = (DELTA_EAR_OCC + 8 * sign(DELTA_EAR_OCC)), label = DELTA_EAR_OCC, fontface = 2),
             position = position_dodge(width = 1), size = 4, color = '#2F2424') +
-  scale_fill_stanford(palette = 'cool', discrete = FALSE, name = 'Weekly Earnings (USD)') +
+  scale_fill_stanford(palette = 'cool reverse', discrete = FALSE, name = 'Weekly Earnings (USD)') +
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
   theme(legend.direction = "horizontal", legend.position = c(0.3, 0.9), legend.box = "vertical",
