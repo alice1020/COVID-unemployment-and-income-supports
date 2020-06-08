@@ -144,13 +144,16 @@ cps <- cps_ind %>%
   filter(CPSIDP %in% unique(cps_asec$CPSIDP)) %>% # filter personal ID present in ACES 2019
   left_join(., cps_asec) %>%
   separate(CPSID, into = c('FIRST_CPS', 'REST_ID'), sep = 6, remove = F) %>% # Separate the first time interviewed
-  filter(LABFORCE == 2) %>%
   mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed ~20%'),
          EITCRED = ifelse(EITCRED == 9999, 0, EITCRED)) 
 
 # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
 cps_20_04 <- cps %>%
-  filter(DATE == '2020-04-01')
+  filter(DATE == '2020-04-01') 
+
+cps_20_04 <- cps_20_04 %>%
+filter(LABFORCE == 2) 
+
 # Quick EITC Sample Analysis
 cps_20_04 %>%
   summarize(eitc_pct = weighted.mean(EITCRED > 0, ASECWT))
