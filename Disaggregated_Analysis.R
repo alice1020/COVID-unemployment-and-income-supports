@@ -19,6 +19,7 @@ library(lubridate)
 library(data.table)
 library(ipumsr)
 library(TraMineR)
+library(srvyr)
 
 # Set the Stanford Color Palette
 stanford_colors <- c(
@@ -60,6 +61,7 @@ stanford_palettes <- list(`main` = stanford_cols('black', 'cool grey', 'chocolat
                           `cool` = stanford_cols('cardinal red', 'cloud', 'green'),
                           `cool reverse` = stanford_cols('green', 'could', 'cardinal red'),
                           `ground` = stanford_cols('chocolate',  'sandstone'),
+                          `ground reverse` = stanford_cols('sandstone', 'chocolate'),
                           `earth` = stanford_cols('dark red', 'sandstone'),
                           `earth reverse` = stanford_cols('sandstone', 'dark red'))
 
@@ -103,15 +105,19 @@ scale_fill_stanford <- function(palette = 'main', discrete = TRUE, reverse = FAL
 # Due to the 4-8-4 design we have longitudinal information for people who were first surveyed in 2018/12 & 2019/01 & 2019/02 & 2019/03
 # 1. Annual Socio-Economic Supplement (ASEC) for 2019 (earnings, eitc, etc)
 # 2. CPS for Jan-Apr 2019 & Jan-Apr 2020 for individual (work) and household information (geo)
+# HWTFINL is a household-level weight that should be used to generate statistics about households. 
+# The CPS uses a complex stratified sampling scheme, and HWTFINL must be used to produce unbiased household-level statistics
+# from IPUMS-CPS basic monthly samples. For analyses of March Annual Social and Economic (ASEC) data, researchers should use HWTSUPP.
+# For individual-level analyses, researchers should use WTFINL, WTSUPP, or EARNWT.
 
 # Data: 20192020 
-cps_ddi_ind <- '/media/alice/TOSHIBA EXT/CPS/Data/CPS_19_20.xml' # Metadata
-cps_data_ind <- '/media/alice/TOSHIBA EXT/CPS/Data/CPS_19_20.dat' # Data
+cps_ddi_ind <- '/media/alice/TOSHIBA EXT/CPS/Data/Core_2019_2020.xml' # Metadata
+cps_data_ind <- '/media/alice/TOSHIBA EXT/CPS/Data/Core_2019_2020.dat' # Data
 cps_ddi_ind <- read_ipums_ddi(cps_ddi_ind)
 cps_ind <- read_ipums_micro(cps_ddi_ind, data_file = cps_data_ind)
 cps_ind <- cps_ind %>%
-  mutate(DATE = make_date(YEAR, MONTH)) %>%
-  select(DATE, CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, LABFORCE, OCC, EDUC99, FAMINC, EMPSTAT, UHRSWORKT) 
+  select(-ASECFLAG, -SERIAL, -PERNUM) %>%
+  mutate(DATE = make_date(YEAR, MONTH))
 
 # How to use the metadata
 #ipums_var_desc(cps_ddi_ind, EMPSTAT) # Variable Description
@@ -124,12 +130,7 @@ cps_data_asec <- '/media/alice/TOSHIBA EXT/CPS/Data/ASEC_2019.dat'
 cps_ddi_asec <- read_ipums_ddi(cps_ddi_asec) 
 cps_asec <- read_ipums_micro(cps_ddi_asec, data_file = cps_data_asec)
 cps_asec <- cps_asec %>%
-  select(CPSIDP, CPSID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, OCCLY, UHRSWORKLY, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED) %>%
-  rename(OCC = OCCLY)
-
-# Merge Monthly CPS and ASEC  
-cps <- left_join(cps_ind, cps_asec, by = c("CPSIDP", "CPSID", "COUNTY", "STATECENSUS", "STATEFIP", "REGION", "CBSASZ", "OCC")) %>%
-  separate(CPSID, into = c('FIRST_CPS', 'REST_ID'), sep = 6, remove = F) # Separate the first time interviewed
+  select(-YEAR, -MONTH, -ASECFLAG) 
 
 ##-----------------------------------------------------------------------------------------------#
 ## Data Management
@@ -138,103 +139,60 @@ cps <- left_join(cps_ind, cps_asec, by = c("CPSIDP", "CPSID", "COUNTY", "STATECE
 # For those who did not work at all during the survey reference week of April 12–18, if a person indicated they were under quarantine or self-isolating due to health concerns, the interviewer should select “own illness, injury, or medical problem.”
 # To be classified as unemployed on temporary layoff, a person has either been given a date to return to work by their employer or expects   to be recalled to their job within 6 months. 
 
-cps <- cps %>%
-  filter(FIRST_CPS != 201804 & FIRST_CPS != 201805 & FIRST_CPS != 201806)  # remove if first wave survey 2018-04 2018-05 2018-06
-
-##-----------------------------------------------------------------------------------------------#
-## Descriptive Statistics
-##-----------------------------------------------------------------------------------------------#
-
-#########################################
-# Sequence Analysis Individual Level
-#########################################
-
-# Structure the data for sequence visualization 
-cps_wide <- cps %>%
-  select(DATE, CPSIDP, EMPSTAT) %>%
-  spread(DATE, EMPSTAT) %>%
-  mutate(`2019-07-01` = NA,
-         `2019-08-01` = NA,
-         `2019-09-01` = NA,
-         `2019-10-01` = NA,
-         `2019-11-01` = NA) %>%
-  select(CPSIDP, `2019-01-01`, `2019-02-01`, `2019-03-01`, `2019-04-01`, `2019-05-01`, `2019-06-01`, `2019-07-01`, `2019-08-01`, `2019-09-01`,
-         `2019-10-01`, `2019-11-01`, `2019-12-01`, `2020-01-01`, `2020-02-01`, `2020-03-01`, `2020-04-01`)
-
-cps_seq <- seqdef(cps_wide, 2:17, void = '*')
-
-sequi_empstat <- seqiplot(cps_seq, idxs = 0, border = NA, space = 0, with.legend = FALSE) 
-#Draw the sequence frequency plot of the 10 most frequent sequences with bar width proportional to the frequencies. Result in Fig. 1(c).
-seqf_empstat <- seqfplot(cps_seq, pbarw = T, with.legend = F) 
-#Plot the state distribution by time points. Result in Fig. 1(d).
-seqd_empstat <- seqdplot(cps_seq, with.legend = F)
-seqlegend(cps_seq, cex = 0.8) 
-
-
-cps_sub <- select(cps, DATE, YEAR, COUNTY, STATECENSUS, STATEFIP, EMPSTAT, OCC, OCC2010, UHRSWORKT, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED) %>%
-  filter(UHRSWORKT == 997 | UHRSWORKT == 999)
-table(cps_sub$DATE)
-cps_sub_20 <- filter(cps_sub, YEAR == 2020)
-table(cps_sub_20$OCC2010)
-table(cps_sub_20$EMPSTAT)
-
-
-#########################################
-# Londitudinal Analysis Individual Level
-#########################################
-
 # Merge Monthly CPS and ASEC  
-cps <- left_join(cps_asec, cps_ind,  by = c("CPSIDP", "CPSID", "COUNTY", "STATECENSUS", "STATEFIP", "REGION", "CBSASZ", "OCC")) %>%
+cps <- cps_ind %>%
+  filter(CPSIDP %in% unique(cps_asec$CPSIDP)) %>% # filter personal ID present in ACES 2019
+  left_join(., cps_asec) %>%
   separate(CPSID, into = c('FIRST_CPS', 'REST_ID'), sep = 6, remove = F) %>% # Separate the first time interviewed
-  rename(UHRSWORKLY2019 = UHRSWORKLY) %>%
-  select(DATE, CPSIDP, CPSID, FIRST_CPS, REST_ID, COUNTY, STATECENSUS, STATEFIP, REGION, CBSASZ, EDUC99, OCC, LABFORCE, EMPSTAT, UHRSWORKT,
-         FAMINC, UHRSWORKLY2019, INCTOT, INCWAGE, INCLONGJ, OINCBUS, OINCFARM, OINCWAGE, EITCRED) %>%
   filter(LABFORCE == 2) %>%
-  mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed, ~17%'),
+  mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed ~20%'),
          EITCRED = ifelse(EITCRED == 9999, 0, EITCRED)) 
 
+# Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
 cps_20_04 <- cps %>%
-  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
   filter(DATE == '2020-04-01')
-# Sample Size Household CPSID: 3,984
+# Quick EITC Sample Analysis
+cps_20_04 %>%
+  summarize(eitc_pct = weighted.mean(EITCRED > 0, ASECWT))
+# ~ 7% of the sample is EITC recipients
 
 # Filter for individuals whi have receiver EITC > 0
 cps_20_04_sub <- filter(cps_20_04, EITCRED > 0)
-# ~9.3% of the sample households have received EITC
 
+# Histogram 
 options('scipen' = 999, 'digits' = 10)
 
 hist_eitc <- ggplot(data =  cps_20_04_sub, 
-                    aes(x = EITCRED, fill = EMPSTAT)) + 
-  geom_histogram() + 
+                    aes(x = EITCRED, fill = EMPSTAT, weight = ASECWT)) + 
+  geom_histogram(bins = 12) + 
   labs(y = '', x = '', fill = 'Employment Status',
-       caption = 'Individual Sample Size: 370. Households Sample Size: 363') + 
-  scale_fill_stanford(palette = 'cool reverse') +
+       caption = 'Households Sample Size: 1,175. Weight adjusted.') + 
+  scale_fill_stanford(palette = 'earth reverse') +
   scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
   theme_minimal() +
   theme(legend.position = c(0.7, 0.9), 
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
         text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
-        panel.background = element_rect(fill = '#F9F6EF', color = '#F9F6EF'),
-        plot.background = element_rect(fill = '#F9F6EF'),
+        panel.background = element_rect(fill = '#ffffff', color = '#ffffff'),
+        plot.background = element_rect(fill = '#ffffff'), 
         legend.background = element_blank(),
         panel.grid = element_line(colour = '#dad7cb')) 
 hist_eitc
 
-ggsave('EITC_Emp_Sub.png', plot = hist_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
+ggsave('EITC_Emp_Sub_W.png', plot = hist_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
 
-
-nrow(filter(cps_20_04_sub, EMPSTAT == 'Unemployed, ~17%')) / nrow(cps_20_04_sub)
-# 62 out of 370 (~17%) individuals who received EITC in 2019 are unemployed in April 2020.
+# Quick EITC Sample Analysis
+cps_20_04_sub %>%
+  summarize(emp_pct = weighted.mean(EMPSTAT == 'Unemployed ~20%', ASECWT))
+# ~19.8% individuals who received EITC in 2019 are unemployed in April 2020.
 
 # Compare with 2019-03
-cps_19_03 <- cps %>%
-  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
-  filter(DATE == '2019-03-01') 
-
-nrow(filter(cps_19_03, EMPSTAT == 'Unemployed, ~17%')) / nrow(cps_19_03)
-# ~2.6% individuals who received EITC in 2019 were unemployed in March 2019.
+cps %>%
+  filter(DATE == '2019-04-01') %>%  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2019
+  filter(EITCRED > 0) %>%
+  summarize(emp_pct = weighted.mean(EMPSTAT == 'Unemployed ~20%', ASECWT))
+# ~5.8% individuals who received EITC in 2019 were unemployed in March 2019.
 
   
   
