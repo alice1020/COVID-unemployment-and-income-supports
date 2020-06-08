@@ -32,12 +32,12 @@ The following figure visualizes the longitudinal structure of the survey. Our da
 We are interested in analyzing the effects of COVID-19 on the employment status with a focus on the Earned Income Tax Credit (EITC). 
 
 ### Individual Level Longitudinal Analysis
-At an individual/household level the sample size for individuals and households observed both in March 2019 (ASEC wave) and April 2020  corresponds to 19,013 individuals and 10,456 households. Among those a sub-sample of 4,700 individuals grouped in 3,984 households are part of the labour force. Visually these are mirrored in the three waves at the top of of Fig. 1. At the end, ~9.3% of the households in the sub-sample have received EITC.
+At an individual/household level the sample size for individuals and households observed both in March 2019 (ASEC wave) and April 2020  corresponds to 31,806 individuals and 13,666 households. Among those a sub-sample of 14,945 individuals grouped in 9,391 households are part of the labour force. Visually these are mirrored in the three waves at the top of of Fig. 1. At the end, ~7% of the households in the sub-sample have received EITC in 2019 (survey weight applied).
 
 |   Level    | # Obs. 03-19 & 04-20 | In the Labor Force | with EITC > 0 |
 |------------|----------------------|--------------------|---------------|
-| Individual |        19,013        |        4,700       |       370     |         
-| Household  |        10,456        |        3,984       |       363     |
+| Individual |        31,806        |        14,945      |      1,175    |         
+| Household  |        13,666        |         9,391      |      1,137    |
 
 
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC/EITC_Emp_Sub_W.png)
