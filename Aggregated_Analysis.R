@@ -112,8 +112,8 @@ scale_fill_stanford <- function(palette = 'main', discrete = TRUE, reverse = FAL
 # To be classified as unemployed on temporary layoff, a person has either been given a date to return to work by their employer or expects   to be recalled to their job within 6 months. 
 
 # 1. Core Monthly Survey & Outgoing Rotation Groups (Earner Study) Variables 2020
-cps_ddi_core <- '/media/alice/TOSHIBA EXT/CPS/Data/Core_2020.xml' # Metadata
-cps_data_core <- '/media/alice/TOSHIBA EXT/CPS/Data/Core_2020.dat' # Data
+cps_ddi_core <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/Core_2020.xml' # Metadata
+cps_data_core <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/Core_2020.dat' # Data
 cps_ddi_core <- read_ipums_ddi(cps_ddi_core)
 cps_core <- read_ipums_micro(cps_ddi_core, data_file = cps_data_core)
 
@@ -122,8 +122,8 @@ cps_core <- read_ipums_micro(cps_ddi_core, data_file = cps_data_core)
 #ipums_val_labels(cps_ddi_core, UHRSWORKORG) # Variable Labels
 
 # 2. Annual Socio-Economic Supplement (ASEC) for 2019 
-cps_ddi_asec <- '/media/alice/TOSHIBA EXT/CPS/Data/ASEC_2019.xml'
-cps_data_asec <- '/media/alice/TOSHIBA EXT/CPS/Data/ASEC_2019.dat'
+cps_ddi_asec <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/ASEC_2019.xml'
+cps_data_asec <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/ASEC_2019.dat'
 cps_ddi_asec <- read_ipums_ddi(cps_ddi_asec) 
 cps_asec <- read_ipums_micro(cps_ddi_asec, data_file = cps_data_asec)
 
@@ -205,10 +205,10 @@ cps_core_occ <- cps_core %>%
             EARNWEEK  = weighted.mean(EARNWEEK, w = EARNWT, na.rm = TRUE)) %>%
   ungroup() %>%
   group_by(OCC_CAT) %>%
-  mutate(DELTA_EMPL_PERC = EMPL_PERC - dplyr::lag(EMPL_PERC, 2, order_by = DATE), # create delta variation in percentage of people employed vs unemployed
+  mutate(DELTA_EMPL_PERC = EMPL_PERC - dplyr::lag(EMPL_PERC, 4, order_by = DATE), # create delta variation in percentage of people employed vs unemployed
          DELTA_EMPL_OCC_PERC = scales::percent(DELTA_EMPL_PERC), # Graphical reasons
-         DELTA_HRS_OCC = round(UHRSWORK1 - dplyr::lag(UHRSWORK1, 2, order_by = DATE), digits = 1),
-         DELTA_EAR_OCC = round(EARNWEEK - dplyr::lag(EARNWEEK, 2, order_by = DATE))) %>%
+         DELTA_HRS_OCC = round(UHRSWORK1 - dplyr::lag(UHRSWORK1, 4, order_by = DATE), digits = 1),
+         DELTA_EAR_OCC = round(EARNWEEK - dplyr::lag(EARNWEEK, 4, order_by = DATE))) %>%
   ungroup() %>%
   left_join(., count_occ, by = "OCC_CAT")
 
@@ -225,7 +225,7 @@ cps_core_rout <- cps_core %>%
             EARNWEEK_ROUT  = weighted.mean(EARNWEEK, w = EARNWT, na.rm = TRUE)) %>%
   ungroup() %>%
   group_by(OCC_ROUT) %>%
-  mutate(DELTA_ROUT = EMPL_PERC_ROUT - dplyr::lag(EMPL_PERC_ROUT, 2, order_by = DATE), # create delta variation in percentage of people employed vs unemployed
+  mutate(DELTA_ROUT = EMPL_PERC_ROUT - dplyr::lag(EMPL_PERC_ROUT, 4, order_by = DATE), # create delta variation in percentage of people employed vs unemployed
          DELTA_PERC_ROUT = scales::percent(DELTA_ROUT)) # Variable used for graphical reasons 
 
 ############################################################
@@ -242,22 +242,23 @@ count_core_rout <- cps_core %>%
                           ifelse(EARNWEEK >= quantile(EARNWEEK, probs = c(.25), na.rm = TRUE) & EARNWEEK < quantile(EARNWEEK, probs = c(.50), na.rm = TRUE), round(quantile(EARNWEEK, probs = c(.5), na.rm = TRUE)),
                           ifelse(EARNWEEK >= quantile(EARNWEEK, probs = c(.50), na.rm = TRUE) & EARNWEEK < quantile(EARNWEEK, probs = c(.75), na.rm = TRUE), round(quantile(EARNWEEK, probs = c(.75), na.rm = TRUE)),
                                  round(quantile(EARNWEEK, probs = c(.95), na.rm = TRUE))))),
-         EARNWEEK_QT_N  = ifelse(EARNWEEK <  quantile(EARNWEEK, probs = c(.25), na.rm = TRUE), '4th',
-                          ifelse(EARNWEEK >= quantile(EARNWEEK, probs = c(.25), na.rm = TRUE) & EARNWEEK < quantile(EARNWEEK, probs = c(.50), na.rm = TRUE), '3rd',
-                          ifelse(EARNWEEK >= quantile(EARNWEEK, probs = c(.50), na.rm = TRUE) & EARNWEEK < quantile(EARNWEEK, probs = c(.75), na.rm = TRUE), '2nd', '1st')))) %>%
+         EARNWEEK_QT_N  = ifelse(EARNWEEK <  quantile(EARNWEEK, probs = c(.25), na.rm = TRUE), '1st',
+                          ifelse(EARNWEEK >= quantile(EARNWEEK, probs = c(.25), na.rm = TRUE) & EARNWEEK < quantile(EARNWEEK, probs = c(.50), na.rm = TRUE), '2nd',
+                          ifelse(EARNWEEK >= quantile(EARNWEEK, probs = c(.50), na.rm = TRUE) & EARNWEEK < quantile(EARNWEEK, probs = c(.75), na.rm = TRUE), '3rd', '4th')))) %>%
   ungroup() %>%
   group_by(DATE, OCC_ROUT, EARNWEEK_QT, EARNWEEK_QT_N) %>%
   count(EMPSTAT, wt = WTFINL) %>% # Weighted # of people by EMPSTAT, OCC_ROUT and EARNWEEK_QT 
   summarize(ROUT_QT_N = sum(n)) %>% 
   ungroup() %>%
   group_by(OCC_ROUT, EARNWEEK_QT_N) %>% 
-  mutate(DELTA_ROUT_QT_N = ROUT_QT_N - dplyr::lag(ROUT_QT_N, 2, order_by = DATE)) %>% # Absolute difference between Feb and May in the Weighted # of people by EMPSTAT, OCC_ROUT and EARNWEEK_QT 
+  mutate(DELTA_ROUT_QT_N = ROUT_QT_N - dplyr::lag(ROUT_QT_N, 4, order_by = DATE)) %>% # Absolute difference between Feb and May in the Weighted # of people by EMPSTAT, OCC_ROUT and EARNWEEK_QT 
   ungroup() %>%
   group_by(OCC_ROUT) %>% 
   mutate(DELTA_ROUT_QT_PERC = (DELTA_ROUT_QT_N / sum(DELTA_ROUT_QT_N, na.rm = TRUE))) %>% # Relative difference between Feb and May in the Weighted # of people by EMPSTAT, OCC_ROUT and EARNWEEK_QT 
   ungroup() %>%
   left_join(cps_core_rout, ., by = c("DATE", "OCC_ROUT")) %>% # Join the aggergated cps_core_rout (DATE, OCC_ROUT)
-  filter(DATE == '2020-04-01') %>%
+#  filter(DATE == '2020-04-01') %>%
+  filter(DATE == '2020-06-01') %>%
   mutate(DELTA_EMP_ROUT_QT_REL = DELTA_ROUT * DELTA_ROUT_QT_PERC) # Cumpute the relative % of EMPSTAT by EARNWEEK_QT within OCC_ROUT
 
 ###############################################################
@@ -274,7 +275,7 @@ cps_asec <- cps_asec %>%
          INCWAGE  = ifelse(INCWAGE == 99999999 | INCWAGE == 99999998, NA, INCWAGE), # Wage and salary income
          INCLONGJ = ifelse(INCLONGJ == 99999999, NA, INCLONGJ), # Earnings form the longest job
          OINCBUS  = ifelse(OINCBUS == 9999999, NA, OINCBUS), # Earnings from other work included business self-employment earnings
-         EITCRED  = ifelse(EITCRED == 9999, 0, EITCRED), # Earned income tax credit
+         EITCRED  = ifelse(EITCRED == 9999, NA, EITCRED), # Earned income tax credit
          OCC_CAT  = ifelse(OCC >= 10   & OCC <= 430, 'Management',
                     ifelse(OCC >= 500  & OCC <= 730, 'Business Operations',
                     ifelse(OCC >= 800  & OCC <= 950, 'Financial Specialists',
@@ -336,10 +337,10 @@ cps_asec_occ <- cps_asec %>%
   filter(OCC_ROUT != 'Armed Forces' & OCC_ROUT != 'No Occupation') %>% # filter out Armed Forces and No Occupation
   group_by(OCC_CAT) %>%
   summarize(INCTOT   = weighted.mean(INCTOT, w = ASECWT, na.rm = TRUE), # Individual level weight
-            INCWAGE  = weighted.mean(INCWAGE, w = ASECWT, na.rm = TRUE), # Individual level weight
-            INCLONGJ = weighted.mean(INCLONGJ, w = ASECWT, na.rm = TRUE), # Individual level weight
-            OINCBUS  = weighted.mean(OINCBUS, w = ASECWT, na.rm = TRUE), # Individual level weight
-            EITCRED  = weighted.mean(EITCRED, w = ASECWT, na.rm = TRUE)) # Household level weight
+            INCWAGE  = weighted.mean(INCWAGE, w = ASECWT, na.rm = TRUE), 
+            INCLONGJ = weighted.mean(INCLONGJ, w = ASECWT, na.rm = TRUE), 
+            OINCBUS  = weighted.mean(OINCBUS, w = ASECWT, na.rm = TRUE), 
+            EITCRED  = weighted.mean(EITCRED, w = ASECWT, na.rm = TRUE)) 
 
 ###########################################
 # Aggregate ASEC by OCC_ROUT
@@ -372,7 +373,8 @@ remove(cps_core_occ, cps_asec_occ, cps_core_rout, cps_asec_rout, count_core_rout
 
 cps_occ <- cps_occ %>%
   filter(OCC_CAT != 'No Occupation') %>%
-  filter(DATE == '2020-04-01')
+  filter(DATE == '2020-06-01')
+#  filter(DATE == '2020-04-01')
 
 # Plot
 plot_occ <- ggplot(data = cps_occ) + 
@@ -471,7 +473,8 @@ dist_rout
 ##############################################
 
 cps_rout <- cps_rout %>%
-  mutate(WHITE = ifelse(EARNWEEK_QT_N == '1st', 1, 0)) # Variable Created for graphica reasons
+  mutate(WHITE = ifelse(EARNWEEK_QT_N == '1st' | EARNWEEK_QT_N == '2nd', 1, 0)) %>% # Variable Created for graphical reasons
+  mutate(EARNWEEK_QT_N = fct_relevel(EARNWEEK_QT_N, '4th', '3rd', '2nd', '1st')) 
 
 # Plot
 plot_rout <- ggplot(data = arrange(cps_rout, DELTA_EMP_ROUT_QT_REL) , aes(x = reorder(OCC_ROUT, DELTA_ROUT), y = DELTA_EMP_ROUT_QT_REL, fill = EARNWEEK_QT_N)) + 
@@ -480,12 +483,13 @@ plot_rout <- ggplot(data = arrange(cps_rout, DELTA_EMP_ROUT_QT_REL) , aes(x = re
   scale_x_discrete(position = 'top') + 
   geom_text(aes(label = scales::percent(DELTA_EMP_ROUT_QT_REL, accuracy = .1), fontface = 2, color = WHITE), 
             position = position_stack(0.5), size = 3.5, angle = 90) +
-  scale_fill_stanford(palette = 'cool') +
-  scale_color_stanford(palette = 'ground', discrete = FALSE) +
-  labs(y = '% Total Difference in Employment', x = '', fill = 'Weekly Earnings Quartiles (USD)', color = '') + 
+  scale_fill_stanford(palette = 'cool', discrete = TRUE) +
+  scale_color_stanford(palette = 'ground reverse', discrete = FALSE) +
+  labs(y = '% Total Difference in Employment', x = '', fill = 'Weekly Earnings Quartiles (USD)') + 
   geom_hline(yintercept = 0, linetype = 'dashed', color = '#2F2424') +
   theme_minimal() +
-  theme(legend.direction = "vertical", legend.position = c(0.2, 1.02),
+  guides(color = FALSE) +
+  theme(legend.direction = "vertical", legend.position = c(0.2, .9),
         axis.ticks = element_blank(),
         axis.text = element_text(color = '#2F2424'),
         text = element_text(size = 14, color = '#2F2424', family = 'Source Sans Pro'),
@@ -546,9 +550,10 @@ cps_hrs <- cps_core %>%
             EARNWEEK  = weighted.mean(EARNWEEK, w = EARNWT, na.rm = TRUE)) %>%
   ungroup() %>%
   group_by(OCC_CAT) %>%
-  mutate(DELTA_HRS_OCC = round(UHRSWORK1 - dplyr::lag(UHRSWORK1, 2, order_by = DATE), digits = 1)) %>%
+  mutate(DELTA_HRS_OCC = round(UHRSWORK1 - dplyr::lag(UHRSWORK1, 4, order_by = DATE), digits = 1)) %>%
   ungroup() %>%
-  filter(DATE ==  '2020-04-01') %>%
+#  filter(DATE ==  '2020-04-01') %>%
+  filter(DATE ==  '2020-06-01') %>%
   filter(OCC_CAT != 'No Occupation')
 
 # Plot

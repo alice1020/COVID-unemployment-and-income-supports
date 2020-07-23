@@ -111,11 +111,14 @@ scale_fill_stanford <- function(palette = 'main', discrete = TRUE, reverse = FAL
 # For individual-level analyses, researchers should use WTFINL, WTSUPP, or EARNWT.
 
 # Data: 20192020 
-cps_ddi_ind <- '/media/alice/TOSHIBA EXT/CPS/Data/Core_2019_2020.xml' # Metadata
-cps_data_ind <- '/media/alice/TOSHIBA EXT/CPS/Data/Core_2019_2020.dat' # Data
+#cps_ddi_ind <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/Core_2019_2020.xml' # Metadata
+#cps_data_ind <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/Core_2019_2020.dat' # Data
+cps_ddi_ind <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/Core_01.2019_06.2020.xml' # Metadata
+cps_data_ind <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/Core_01.2019_06.2020.dat' # Data
 cps_ddi_ind <- read_ipums_ddi(cps_ddi_ind)
 cps_ind <- read_ipums_micro(cps_ddi_ind, data_file = cps_data_ind)
 cps_ind <- cps_ind %>%
+#  filter(ASECFLAG == 2) %>% # filter only respondants who are also part of the ASEC
   select(-ASECFLAG, -SERIAL, -PERNUM) %>%
   mutate(DATE = make_date(YEAR, MONTH))
 
@@ -125,12 +128,13 @@ cps_ind <- cps_ind %>%
 #ipums_val_labels(cps_ddi_ind, UHRSWORKT) # Variable Labels
 
 # Annual Socio-Economic Supplement (ASEC) 2019
-cps_ddi_asec <- '/media/alice/TOSHIBA EXT/CPS/Data/ASEC_2019.xml'
-cps_data_asec <- '/media/alice/TOSHIBA EXT/CPS/Data/ASEC_2019.dat'
+cps_ddi_asec <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/ASEC_2019.xml'
+cps_data_asec <- '/media/alice/TOSHIBA EXT/PostDoc/UBI_EITC/Data/CPS/Data/ASEC_2019.dat'
 cps_ddi_asec <- read_ipums_ddi(cps_ddi_asec) 
 cps_asec <- read_ipums_micro(cps_ddi_asec, data_file = cps_data_asec)
 cps_asec <- cps_asec %>%
-  select(-YEAR, -MONTH, -ASECFLAG) 
+  filter(ASECOVERH != 1) %>%
+  select(-YEAR, -MONTH, -REGION, -STATEFIP, -METRO, -METAREA, -COUNTY, -STATECENSUS, -CBSASZ, -METFIPS)
 
 ##-----------------------------------------------------------------------------------------------#
 ## Data Management
@@ -141,37 +145,29 @@ cps_asec <- cps_asec %>%
 
 # Merge Monthly CPS and ASEC  
 cps <- cps_ind %>%
-  filter(CPSIDP %in% unique(cps_asec$CPSIDP)) %>% # filter personal ID present in ACES 2019
-  left_join(., cps_asec) %>%
-  separate(CPSID, into = c('FIRST_CPS', 'REST_ID'), sep = 6, remove = F) %>% # Separate the first time interviewed
-  mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed ~20%'),
-         EITCRED = ifelse(EITCRED == 9999, 0, EITCRED)) 
+  left_join(., cps_asec, by = c("CPSID", "CPSIDP")) %>%
+  filter(LABFORCE == 2) %>% # filter only people in the labour force
+  mutate(EMPSTAT = ifelse(EMPSTAT == 10 | EMPSTAT == 12, 'At work & Has job, not at work last week', 'Unemployed ~20%'), # re-code the employment status variable into a dicot.
+         EITCRED = ifelse(EITCRED == 9999, NA, EITCRED)) 
 
 # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2020
 cps_20_04 <- cps %>%
-  filter(DATE == '2020-04-01') 
-
-cps_20_04 <- cps_20_04 %>%
-filter(LABFORCE == 2) 
+  filter(DATE == '2020-06-01') 
 
 # Quick EITC Sample Analysis
 cps_20_04 %>%
-  summarize(eitc_pct = weighted.mean(EITCRED > 0, ASECWT))
+  summarize(eitc_pct = weighted.mean(EITCRED > 0, ASECWTH))
 # ~ 7% of the sample is EITC recipients
-
-# Filter for individuals whi have receiver EITC > 0
-cps_20_04_sub <- filter(cps_20_04, EITCRED > 0)
 
 # Histogram 
 options('scipen' = 999, 'digits' = 10)
 
-hist_eitc <- ggplot(data =  cps_20_04_sub, 
-                    aes(x = EITCRED, fill = EMPSTAT, weight = ASECWT)) + 
-  geom_histogram(bins = 12) + 
+hist_eitc <- ggplot(data =  filter(cps_20_04, EITCRED > 0),  # Filter for individuals whi have receiver EITC > 0
+                    aes(x = EITCRED, fill = EMPSTAT, weight = ASECWTH)) + 
+  geom_histogram(bins = 15) + 
   labs(y = '', x = '', fill = 'Employment Status',
        caption = 'Households Sample Size: 1,175. Weight adjusted.') + 
   scale_fill_stanford(palette = 'earth reverse') +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
   theme_minimal() +
   theme(legend.position = c(0.7, 0.9), 
         axis.ticks = element_blank(),
@@ -186,16 +182,42 @@ hist_eitc
 ggsave('EITC_Emp_Sub_W.png', plot = hist_eitc, path = '/home/alice/Dropbox/PostDoc/UBI_EITC/', width = 25, height = 18,  units = c('cm'))
 
 # Quick EITC Sample Analysis
-cps_20_04_sub %>%
-  summarize(emp_pct = weighted.mean(EMPSTAT == 'Unemployed ~20%', ASECWT))
-# ~19.8% individuals who received EITC in 2019 are unemployed in April 2020.
+filter(cps_20_04, EITCRED > 0) %>%
+  summarize(emp_pct = weighted.mean(EMPSTAT == 'Unemployed ~20%', ASECWTH))
+# ~19.3% individuals who received EITC in 2019 are unemployed in April 2020.
+# ~16.4% individuals who received EITC in 2019 are unemployed in June 2020.
+filter(cps_20_04, EITCRED > 0 & EMPSTAT == 'Unemployed ~20%') %>%
+  summarize(n_eitc = sum(ASECWTH))
+# 375,678
 
 # Compare with 2019-03
 cps %>%
-  filter(DATE == '2019-04-01') %>%  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2019
+  filter(DATE == '2019-06-01') %>%  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2019
   filter(EITCRED > 0) %>%
-  summarize(emp_pct = weighted.mean(EMPSTAT == 'Unemployed ~20%', ASECWT))
-# ~5.8% individuals who received EITC in 2019 were unemployed in March 2019.
+  summarize(emp_pct = weighted.mean(EMPSTAT == 'Unemployed ~20%', ASECWTH))
+# ~5.7% individuals who received EITC in 2019 were unemployed in March 2019.
+# ~4.7% individuals who received EITC in 2019 were unemployed in June 2019.
+
+# Representiative Household
+cps_eitc_2c <- cps %>%
+ # filter(DATE == '2019-04-01') %>%  # Filter a subsample of individuals in the labor force observed in (ASEC) March 2019 & Apr 2019
+  filter(EITCRED > 0 & NCHILD == 2) %>%
+  summarize(emp_pct = weighted.mean(EITCRED, ASECWTH, na.rm = T))
+
+
+filter(cps, EITCRED > 0) %>%
+  summarize(n_eitc = sum(ASECWTH))
+filter(cps, EITCRED > 0 & EMPSTAT == 'Unemployed ~20%') %>%
+  summarize(n_eitc = sum(ASECWTH))
+# 2,928,376
 
   
-  
+# Analysis of childless lower income workers
+
+cps_childless <- cps %>%
+  filter(NCHILD == 0 & FAMSIZE == 1 & EITCRED > 0) %>%
+  summarize(inc = weighted.mean(INCTOT, ASECWT, na.rm = T),
+            eitc = weighted.mean(EITCRED, ASECWT, na.rm = T))
+
+
+
