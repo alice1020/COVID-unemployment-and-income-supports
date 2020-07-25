@@ -126,10 +126,10 @@ At an individual/household level the sample size for individuals and households 
 
 Approximately 16.4% of people who received the EITC in 2019 are experiencing unemployment between February and June 2020. This represents an increase of the 350% with respect to June 2019.
 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/EITC_Emp_Sub_W.png)
 **Fig. 3:** EITC 2019 and Employment status in June 2020
-</center>
+
 
 
 Codes for this part are available in the file: [Disaggregated_Analysis_June.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Disaggregated_Analysis_June.R)
@@ -142,47 +142,47 @@ We analyze the CPS data by aggregating over the occupational categories. Our cro
 ### Employment vs Unemployment
 
 We explore the impact of COVID-19 on employment. 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/Empl_Occ.png)
 **Fig. 4:** % Difference in employment between February and June 2020 by occupational category.
-</center>
 
-<center>
+
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/W_Dist_Rout.png)
 **Fig. 5:** Wage Distribution by Occupation.
-</center>
 
-<center>
+
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/Empl_Rout.png)
 **Fig 6:** % Difference in employment between February and June 2020 for by wage quartile. 
-</center>
+
 
 ###  Hours Worked
 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/Hrs_Occ.png)
 **Fig. 7:** Difference in hours usually worked per week at the main job between February and June 2020 by occupation (unemployed with hrs = 0 are included).
-</center>
 
-<center>
+
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/Hrs_Occ_Emp.png)
 **Fig. 8:** Difference in hours usually worked per week at the main job between February and June 2020 by occupation among employed only.
-</center>
+
 
 ### Weekly Earnings
 
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/Earn_Occ_Emp.png)
 **Fig. 9:** Difference in weekly earnings at the main job between February and June 2020 by occupation among employed only.
-</center>
+
 
 
 ### EITC by Occupational Category
   
-<center>
+
 ![](https://aliceindataland.rbind.io/img/COVID-19-EITC-June/EITC_Occ.png)
 **Fig. 10:** Average EITC perceived in 2019 vs % Difference in employment between February and June 2020 by occupational category.
-</center>
+
 
 Codes for this part are available in the file: [Aggregated_Analysis_June.R](https://github.com/alice1020/COVID-unemployment-and-income-supports/blob/master/Aggregated_Analysis_June.R)
 
