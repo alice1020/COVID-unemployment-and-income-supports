@@ -1,0 +1,32 @@
+{
+	"baseline" : {
+        "0": {
+            "earned_income_base_amount": 6920,
+            "begin_phaseout": 8650,
+            "marriage_penalty_relief": 5800,
+            "phase_in_rate": 0.0765,
+            "phase_out_rate": 0.0765
+        },
+        "1": {
+            "earned_income_base_amount": 10370,
+            "begin_phaseout": 19030,
+            "marriage_penalty_relief": 5800,
+            "phase_in_rate": 0.34,
+            "phase_out_rate": 0.1598
+        },
+        "2": {
+            "earned_income_base_amount": 14570,
+            "begin_phaseout": 19030,
+            "marriage_penalty_relief": 5800,
+            "phase_in_rate" : 0.4,
+            "phase_out_rate": 0.2106
+        },
+        "3": {
+            "earned_income_base_amount": 14570,
+            "begin_phaseout": 19030,
+            "marriage_penalty_relief": 5800,
+            "phase_in_rate": 0.45,
+            "phase_out_rate": 0.2106
+        }
+    }
+}
